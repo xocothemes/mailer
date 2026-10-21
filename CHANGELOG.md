@@ -2,6 +2,12 @@
 
 All notable changes to Mailer are documented here.
 
+## 1.0.1 - 2026-10-21
+
+- Updated Astro to 7.4.1 and other dependencies.
+- Updated `AGENTS.md` for Astro 7.
+- Files check out with LF line endings on every platform.
+
 ## 1.0.0 - 2026-09-21
 
 - Initial release.

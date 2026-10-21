@@ -83,6 +83,40 @@ accessible, secure, fast code over clever abstractions.
   project. Values exposed to client code are public. Never expose a secret with
   a `PUBLIC_` variable or serialize it into HTML.
 
+## Current Astro APIs
+
+This project runs on Astro 7. Older Astro patterns are common in training
+data, so check the installed version in `package.json` and the current docs at
+https://docs.astro.build (or the Astro Docs MCP server,
+`https://mcp.docs.astro.build/mcp`) instead of relying on memory.
+
+- Do not use APIs removed in Astro 6: `Astro.glob()` (use `import.meta.glob()`),
+  `<ViewTransitions />` (use `<ClientRouter />`), `src/content/config.ts`,
+  `entry.slug`, `entry.render()`, and `getEntryBySlug()`. Collections are
+  defined in `src/content.config.ts` with a loader such as `glob()` or `file()`;
+  entries have an `id` and are rendered with `render(entry)` from
+  `astro:content`.
+- Import `z` from `astro/zod`, not from `astro:content` or `astro:schema`. It is
+  Zod 4: use `z.email()` and `z.url()` rather than `z.string().email()`, and the
+  `error` option rather than `message`.
+- The `.astro` compiler no longer repairs markup. Close every non-void element
+  and keep nesting valid (no block elements inside `<p>`).
+- HTML is compressed with JSX whitespace rules (`compressHTML: 'jsx'`), so
+  whitespace between inline elements on separate lines is dropped. Use `{" "}`
+  where a space must survive.
+- Markdown and MDX use the Sätteri processor by default. remark and rehype
+  plugins run only with `@astrojs/markdown-remark` installed and
+  `markdown.processor` set to `unified()`. Keep the processor the project
+  already uses.
+- `import.meta.env` values are inlined at build time and never coerced
+  (`"true"` stays a string). Prefer `astro:env` with a schema for new variables.
+- `getStaticPaths()` params must be strings. Inside it, use
+  `import.meta.env.SITE` rather than `Astro.site`.
+- `src/fetch.ts` is reserved for Astro's advanced routing. Do not create a file
+  with that name for anything else.
+- Add official integrations with `astro add`, run through the project's package
+  manager, rather than wiring them up by hand.
+
 ## Components and styling
 
 - Prefer semantic HTML and shallow markup over wrapper-heavy component trees.
@@ -214,6 +248,11 @@ At minimum:
    configuration, or dependencies.
 5. Inspect the final diff for unrelated edits, generated files, secrets, debug
    output, placeholder content, and accidental public API changes.
+
+Before starting a dev server, check whether one is already running. When it
+detects an AI agent (on macOS and Linux) or is given `--background`, `astro dev`
+runs as a background process; manage it with `astro dev status`,
+`astro dev logs`, and `astro dev stop`, and check readiness at `/_astro/status`.
 
 For UI work, also verify the affected pages at representative mobile and desktop
 sizes, keyboard operation, visible focus, missing-content states, and browser
